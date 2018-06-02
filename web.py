@@ -12,7 +12,7 @@ app = Flask(__name__)
 @app.route('/control')
 def control():
     json_form = json.loads(request.json)
-    data = str(json_form['data'])
+    data = str(json_form['data']).encode('utf-8')
     ArduinoSerial.write(bytes(data))
     return 'ok'
 
