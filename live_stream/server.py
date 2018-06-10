@@ -7,6 +7,7 @@ import io
 # Define the cameras
 vc = cv2.VideoCapture(0)
 
+app = Flask(__name__)
 
 @app.route('/')
 def index():
@@ -22,7 +23,7 @@ def gen_zero():
                b'Content-Type: image/jpeg\r\n\r\n' + open('t.jpg', 'rb').read() + b'\r\n')
 
 @app.route('/video_feed_zero')
-def video_feed():
+def video_feed_zero():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(gen_zero(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
