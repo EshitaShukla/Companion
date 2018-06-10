@@ -357,7 +357,7 @@ class Start(tk.Frame):      # LogIn page
         logIn.grid(sticky=NE,row=0,column=5)
 
         reg=ttk.Button(self,text="Register",command=lambda:controller.show_frame(Register))
-        reg.grid(sticky=NE,row=0,column=5)
+        reg.grid(sticky=NE,row=0,column=6)
 
         Front=ttk.Button(self,text="Front",command=lambda:controller.show_frame(P2))
         Front.grid(row=3,column=1)
@@ -407,7 +407,6 @@ class LogIn(tk.Frame):      # LogIn page
         Ps= Entry(self,bd=10,textvariable=Password)
         Ps.grid(row=3,column=2)
 
-        
         Light=StringVar()
         Pin=StringVar()
 
@@ -423,6 +422,11 @@ class LogIn(tk.Frame):      # LogIn page
             file2.write(' ')
             file2.write(pin)
             file2.write('\n')
+
+            file2.close()
+
+            b=Button(self,text=light,command=lambda:print(pin))
+            b.grid()
         
         def give_options():
 
@@ -446,26 +450,39 @@ class LogIn(tk.Frame):      # LogIn page
                     L1.grid(row=6)
 
                     L=Label(self,text="Add pins",font="forte 25",fg=fg3,bg=bg3)
-                    L.grid(row=0,column=1, columnspan=3)
+                    L.grid(row=7,column=1, columnspan=3)
 
                     l=Label(self,text="                        ",font="forte",bg=bg3)
-                    l.grid(row=2,column=0)
+                    l.grid(row=8,column=0)
 
 
                     L2=Label(self,text="Light: ",font="forte",fg=fg3,bg=bg3)
-                    L2.grid(row=2,column=1)
+                    L2.grid(row=9,column=1)
 
                     L3=Label(self,text="Pin: ",font="forte",fg=fg3,bg=bg3)
-                    L3.grid(row=3,column=1)
+                    L3.grid(row=10,column=1)
 
                     Us= Entry(self,bd=10,textvariable=Light)
-                    Us.grid(row=2,column=2)
+                    Us.grid(row=9,column=2)
 
                     Ps= Entry(self,bd=10,textvariable=Pin)
-                    Ps.grid(row=3,column=2)
+                    Ps.grid(row=10,column=2)
 
                     Add=ttk.Button(self,text="Add",command=lambda:Adding_pins(username))
-                    Add.grid()
+                    Add.grid(row=11)
+
+                    Li=[]
+
+                    for line in open(username+'.txt','r'):
+                
+                        L3=line.split()
+                        Li.append(L3)
+
+                    for i in range (len(Li)):
+                        b1=Button(self,text=str(Li[i][0]),command=lambda i=i :print(Li[i][1]))
+                        b1.grid()
+                        print("added")
+ 
 
                     return True
 
@@ -479,10 +496,10 @@ class LogIn(tk.Frame):      # LogIn page
             
 
 
-        Submit=ttk.Button(self,text="Submit",command=lambda:controller.show_frame(P2))
+        Submit=ttk.Button(self,text="Submit",command=lambda:give_options())
         Submit.grid(row=4)
         
-        Home=ttk.Button(self,text="Home",command=lambda:controller.show_frame(P2))
+        Home=ttk.Button(self,text="Home",command=lambda:controller.show_frame(Start))
         Home.grid(row=5)
 
 class Register(tk.Frame):      # LogIn page
