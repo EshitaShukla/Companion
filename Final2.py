@@ -7,6 +7,19 @@ from tkinter import Canvas
 from tkinter.constants import *
 from PIL import Image, ImageDraw, ImageTk
 
+import json
+import requests
+import time
+
+import serial
+from serial import *
+import time
+from tkinter import *
+
+ArduinoSerial = serial.Serial('COM3', 9600, timeout=.1)
+
+status1 = 0
+
 #Theme chooser
 bg1="#8313a6"
 bg2="#3056b3"
@@ -208,11 +221,12 @@ class traj(tkt.ThemedTk,tk.Tk):
         self.f2.config(bg=bg2)
 
 
-        self.x=GradientFrame(self.f, from_color=bg2, to_color=bg1, height=35,fill="both")
+        """self.x=GradientFrame(self.f, from_color=bg2, to_color=bg1, height=35,fill="both")
         self.x.pack(fill="both")
 
         self.y=GradientFrame(self.f2, from_color="#FFFFFF", to_color=bg2, height=35,fill="both")
         self.y.pack(fill="both")
+        """
 
 
         q=ttk.Button(self.f1,text="Quit",command=lambda:sys.exit())
@@ -276,8 +290,9 @@ class traj(tkt.ThemedTk,tk.Tk):
 	        self.submenu2.config(foreground=bg3,background=fg4,activebackground="snow",activeforeground=fg3)
 	        print("pack")
 
-	        self.x=GradientFrame(f, from_color=bg2, to_color=bg1, height=35,fill="both").pack(fill="both")
+	        """self.x=GradientFrame(f, from_color=bg2, to_color=bg1, height=35,fill="both").pack(fill="both")
 	        self.y=GradientFrame(f2, from_color="#FFFfff", to_color=bg2, height=35,fill="both").pack(fill="both")
+"""
 	        self.f=f
 	        self.f1=f1
 	        self.f2=f2
@@ -359,26 +374,39 @@ class Start(tk.Frame):      # LogIn page
         reg=ttk.Button(self,text="Register",command=lambda:controller.show_frame(Register))
         reg.grid(sticky=NE,row=0,column=6)
 
-        Front=ttk.Button(self,text="Front",command=lambda:controller.show_frame(P2))
+        def Pi_sending(dat):
+            actuation_value = {'data' : str(dat)}
+            data_json = json.dumps(actuation_value)
+            payload = data_json
+            print(data_json)
+            r = requests.get('http://192.168.43.233:5000/control', json=payload)
+            print(r.text)
+            time.sleep(1)
+            
+
+        Front=ttk.Button(self,text="Front",command=lambda:Pi_sending(0))
         Front.grid(row=3,column=1)
 
-        Left=ttk.Button(self,text="Left",command=lambda:controller.show_frame(P2))
+        Left=ttk.Button(self,text="Left",command=lambda:Pi_sending(3))
         Left.grid(row=4,column=0)
 
-        Right=ttk.Button(self,text="Right",command=lambda:controller.show_frame(P2))
+        Right=ttk.Button(self,text="Right",command=lambda:Pi_sending(2))
         Right.grid(row=4,column=2)
 
-        Back=ttk.Button(self,text="Back",command=lambda:controller.show_frame(P2))
+        Back=ttk.Button(self,text="Back",command=lambda:Pi_sending(1))
         Back.grid(row=4,column=1)
 
         L2=Label(self,text="    ",font="forte 25",fg=fg3,bg=bg3)
         L2.grid(column=1)
 
-        Ball=ttk.Button(self,text="Ball",command=lambda:controller.show_frame(P2))
-        Ball.grid(column=1)
+        Food_dispense=ttk.Button(self,text="Dispense Food",command=lambda:Pi_sending(4))
+        Food_dispense.grid(column=0,columnspan=2)
 
-        Food=ttk.Button(self,text="Food",command=lambda:controller.show_frame(P2))
-        Food.grid(column=1)
+        Food_refill=ttk.Button(self,text="Refill Food",command=lambda:Pi_sending(5))
+        Food_refill.grid(column=0,columnspan=2)
+
+        Stop=ttk.Button(self,text="Stop",command=lambda:Pi_sending(6))
+        Stop.grid(column=0,columnspan=2)
 
 class LogIn(tk.Frame):      # LogIn page
 
@@ -410,6 +438,12 @@ class LogIn(tk.Frame):      # LogIn page
         Light=StringVar()
         Pin=StringVar()
 
+        def Arduino_send(x):
+
+            d1=str(x).encode("utf-8")
+            d2=bytes(d1)
+            ArduinoSerial.write(d2)
+
 
         def Adding_pins(username):
 
@@ -425,8 +459,10 @@ class LogIn(tk.Frame):      # LogIn page
 
             file2.close()
 
-            b=Button(self,text=light,command=lambda:print(pin))
-            b.grid()
+            b1=Button(self,text=light+" on",command=lambda:Arduino_send(pin+"_on"))
+            b1.grid()
+            b2=Button(self,text=light+" off",command=lambda:Arduino_send(pin+"_off"))
+            b2.grid()
         
         def give_options():
 
